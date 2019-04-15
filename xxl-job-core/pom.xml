@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy</artifactId>
-			<version>${groovy-all.version}</version>
+			<version>${groovy.version}</version>
 		</dependency>
 
 		<!-- commons-exec -->
@@ -34,13 +34,6 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-exec</artifactId>
 			<version>${commons-exec.version}</version>
-		</dependency>
-
-		<!-- jackson -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
 		</dependency>
 
 		<!-- spring-context -->

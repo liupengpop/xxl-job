@@ -47,6 +47,7 @@ XXL-JOB是一个轻量级分布式任务调度平台，其核心设计目标是�
 - 30、跨平台：原生提供通用HTTP任务Handler（Bean任务，"HttpJobHandler"）；业务方只需要提供HTTP链接即可，不限制语言、平台；
 - 31、国际化：调度中心支持国际化设置，提供中文、英文两种可选语言，默认为中文；
 - 32、容器化：提供官方docker镜像，并实时更新推送dockerhub，进一步实现产品开箱即用；
+- 33、线程池隔离：调度线程池进行隔离拆分，慢任务自动降级进入"Slow"线程池，避免耗尽调度线程，提高系统稳定性；；
 
 
 ### 1.3 发展
@@ -212,6 +213,36 @@ XXL-JOB是一个轻量级分布式任务调度平台，其核心设计目标是�
     - 131、北京互联新网科技发展有限公司
     - 132、誉道科技
     - 133、山西兆盛房地产开发有限公司
+    - 134、北京蓝睿通达科技有限公司
+    - 135、月亮小屋（中国）有限公司（蓝月亮）
+    - 136、青岛国瑞信息技术有限公司
+    - 137、博雅云计算（北京）有限公司
+    - 138、华泰证券香港子公司
+    - 139、杭州东方通信软件技术有限公司
+    - 140、武汉博晟安全技术股份有限公司
+    - 141、深圳市六度人和科技有限公司
+    - 142、杭州趣维科技有限公司（小影）
+    - 143、宁波单车侠之家科技有限公司（单车侠）
+    - 144、丁丁云康信息科技（北京）有限公司
+    - 145、云钱袋
+    - 146、南京中兴力维
+    - 147、上海矽昌通信技术有限公司
+    - 148、深圳萨科科技
+    - 149、中通服创立科技有限责任公司
+    - 150、深圳市对庄科技有限公司
+    - 151、上证所信息网络有限公司
+    - 152、杭州火烧云科技有限公司（婚礼纪）
+    - 153、天津青芒果科技有限公司 (芒果头条)
+    - 154、长飞光纤光缆股份有限公司
+    - 155、世纪凯歌（北京）医疗科技有限公司
+    - 156、浙江霖梓控股有限公司
+    - 157、江西腾飞网络技术有限公司
+    - 158、安迅物流有限公司
+    - 159、肉联网
+    - 160、北京北广梯影广告传媒有限公司
+    - 161、上海数慧系统技术有限公司
+    - 162、大志天成
+    - 163、上海云鹊医
 	- ……
 
 > 更多接入的公司，欢迎在 [登记地址](https://github.com/xuxueli/xxl-job/issues/1 ) 登记，登记仅仅为了产品推广。
@@ -250,12 +281,9 @@ XXL-JOB是一个轻量级分布式任务调度平台，其核心设计目标是�
 - [Gitter](https://gitter.im/xuxueli/xxl-job)
 
 ### 1.5 环境
-- JDK：1.7+
-- Servlet/JSP Spec：3.1/2.3
-- Tomcat：8.5.x/Jetty9.2.x
-- Spring-boot：1.5.x/Spring4.x
-- Mysql：5.6+
-- Maven：3+
+- Maven3+
+- Jdk1.7+
+- Mysql5.6+
 
 
 ## 二、快速入门
@@ -276,9 +304,10 @@ XXL-JOB是一个轻量级分布式任务调度平台，其核心设计目标是�
 
     xxl-job-admin：调度中心
     xxl-job-core：公共依赖
-    xxl-job-executor：执行器Sample示例（选择合适的版本执行器，可直接使用，也可以参考其并将现有项目改造成执行器）
-        ：xxl-job-executor-sample-spring：Spring版本，通过Spring容器管理执行器，比较通用，推荐这种方式；
-        ：xxl-job-executor-sample-springboot：Springboot版本，通过Springboot管理执行器；
+    xxl-job-executor-samples：执行器Sample示例（选择合适的版本执行器，可直接使用，也可以参考其并将现有项目改造成执行器）
+        ：xxl-job-executor-sample-springboot：Springboot版本，通过Springboot管理执行器，推荐这种方式；
+        ：xxl-job-executor-sample-spring：Spring版本，通过Spring容器管理执行器，比较通用；
+        ：xxl-job-executor-sample-frameless：无框架版本；
         ：xxl-job-executor-sample-jfinal：JFinal版本，通过JFinal管理执行器；
         ：xxl-job-executor-sample-nutz：Nutz版本，通过Nutz管理执行器；
         
@@ -344,7 +373,7 @@ XXL-JOB是一个轻量级分布式任务调度平台，其核心设计目标是�
 - 下载镜像
 
 ```
-// Docker地址：https://hub.docker.com/r/xuxueli/xxl-job-admin/
+// Docker地址：https://hub.docker.com/r/xuxueli/xxl-job-admin/     (建议指定版本号)
 docker pull xuxueli/xxl-job-admin
 ```
 
@@ -363,7 +392,7 @@ docker run -e PARAMS="--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/xxl-jo
 
 ### 2.4 配置部署“执行器项目”
 
-    “执行器”项目：xxl-job-executor-sample-spring (提供多种版本执行器供选择，现以Spring版本为例，可直接使用，也可以参考其并将现有项目改造成执行器)
+    “执行器”项目：xxl-job-executor-sample-springboot (提供多种版本执行器供选择，现以 springboot 版本为例，可直接使用，也可以参考其并将现有项目改造成执行器)
     作用：负责接收“调度中心”的调度并执行；可直接部署执行器，也可以将执行器集成到现有业务项目中。
     
 #### 步骤一：maven依赖
@@ -372,25 +401,29 @@ docker run -e PARAMS="--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/xxl-jo
 #### 步骤二：执行器配置
 执行器配置，配置文件地址：
 
-    /xxl-job/xxl-job-executor-samples/xxl-job-executor-sample-spring/src/main/resources/xxl-job-executor.properties
+    /xxl-job/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/resources/application.properties
 
 执行器配置，配置内容说明：
 
-    ### xxl-job admin address list：调度中心部署跟地址：如调度中心集群部署存在多个地址则用逗号分隔。执行器将会使用该地址进行"执行器心跳注册"和"任务结果回调"。
+    ### 调度中心部署跟地址 [选填]：如调度中心集群部署存在多个地址则用逗号分隔。执行器将会使用该地址进行"执行器心跳注册"和"任务结果回调"；为空则关闭自动注册；
     xxl.job.admin.addresses=http://127.0.0.1:8080/xxl-job-admin
     
-    ### xxl-job executor address：执行器"AppName"和地址信息配置：AppName执行器心跳注册分组依据；地址信息用于"调度中心请求并触发任务"和"执行器注册"。执行器默认端口为9999，执行器IP默认为空表示自动获取IP，多网卡时可手动设置指定IP，该IP不会绑定Host仅作为通讯实用。单机部署多个执行器时，注意要配置不同执行器端口；
+    ### 执行器AppName [选填]：执行器心跳注册分组依据；为空则关闭自动注册
     xxl.job.executor.appname=xxl-job-executor-sample
+    
+    ### 执行器IP [选填]：默认为空表示自动获取IP，多网卡时可手动设置指定IP，该IP不会绑定Host仅作为通讯实用；地址信息用于 "执行器注册" 和 "调度中心请求并触发任务"；
     xxl.job.executor.ip=
+    
+    ### 执行器端口号 [选填]：小于等于0则自动获取；默认端口为9999，单机部署多个执行器时，注意要配置不同执行器端口；
     xxl.job.executor.port=9999
     
-    ### xxl-job, access token：执行器通讯TOKEN，非空时启用
+    ### 执行器通讯TOKEN [选填]：非空时启用；
     xxl.job.accessToken=
         
-    ### xxl-job log path：执行器运行日志文件存储的磁盘位置，需要对该路径拥有读写权限
-    xxl.job.executor.logpath=/data/applogs/xxl-job/jobhandler/
+    ### 执行器运行日志文件存储磁盘路径 [选填] ：需要对该路径拥有读写权限；为空则使用默认路径；
+    xxl.job.executor.logpath=/data/applogs/xxl-job/jobhandler
     
-    ### xxl-job log retention days：执行器Log文件定期清理功能，指定日志保存天数，日志文件过期自动删除。限制至少保持3天，否则功能不生效；
+    ### 执行器日志保存天数 [选填] ：值大于3时生效，启用执行器Log文件定期清理功能，否则不生效；
     xxl.job.executor.logretentiondays=-1
     
 
@@ -398,31 +431,25 @@ docker run -e PARAMS="--spring.datasource.url=jdbc:mysql://127.0.0.1:3306/xxl-jo
 
 执行器组件，配置文件地址：
 
-    /xxl-job/xxl-job-executor-samples/xxl-job-executor-sample-spring/src/main/resources/applicationcontext-xxl-job.xml
+    /xxl-job/xxl-job-executor-samples/xxl-job-executor-sample-springboot/src/main/java/com/xxl/job/executor/core/config/XxlJobConfig.java
 
 执行器组件，配置内容说明：
 
 ```
-<!-- 配置01、JobHandler 扫描路径：自动扫描容器中JobHandler -->
-<context:component-scan base-package="com.xxl.job.executor.service.jobhandler" />
+@Bean(initMethod = "start", destroyMethod = "destroy")
+public XxlJobSpringExecutor xxlJobExecutor() {
+    logger.info(">>>>>>>>>>> xxl-job config init.");
+    XxlJobSpringExecutor xxlJobSpringExecutor = new XxlJobSpringExecutor();
+    xxlJobSpringExecutor.setAdminAddresses(adminAddresses);
+    xxlJobSpringExecutor.setAppName(appName);
+    xxlJobSpringExecutor.setIp(ip);
+    xxlJobSpringExecutor.setPort(port);
+    xxlJobSpringExecutor.setAccessToken(accessToken);
+    xxlJobSpringExecutor.setLogPath(logPath);
+    xxlJobSpringExecutor.setLogRetentionDays(logRetentionDays);
 
-<!-- 配置02、执行器 -->
-<bean id="xxlJobExecutor" class="com.xxl.job.core.executor.XxlJobExecutor" init-method="start" destroy-method="destroy" >
-    <!-- 执行器注册中心地址[选填]，为空则关闭自动注册 -->
-    <property name="adminAddresses" value="${xxl.job.admin.addresses}" />
-    <!-- 执行器AppName[选填]，为空则关闭自动注册 -->
-    <property name="appName" value="${xxl.job.executor.appname}" />
-    <!-- 执行器IP[选填]，为空则自动获取 -->
-    <property name="ip" value="${xxl.job.executor.ip}" />
-    <!-- 执行器端口号[选填]，小于等于0则自动获取 -->
-    <property name="port" value="${xxl.job.executor.port}" />
-    <!-- 访问令牌[选填]，非空则进行匹配校验 -->
-    <property name="accessToken" value="${xxl.job.accessToken}" />
-    <!-- 执行器日志路径[选填]，为空则使用默认路径 -->
-    <property name="logPath" value="${xxl.job.executor.logpath}" />
-    <!-- 日志保存天数[选填]，值大于3时生效 -->
-    <property name="logRetentionDays" value="${xxl.job.executor.logretentiondays}" />
-</bean>
+    return xxlJobSpringExecutor;
+}
 ```
 
 #### 步骤四：部署执行器项目：
@@ -695,6 +722,8 @@ try{
 
 而且，在JobHandler中开启子线程时，子线程也不可catch处理"InterruptedException"，应该主动向上抛出。
 
+任务终止时会执行对应JobHandler的"destroy()"方法，可以借助该方法处理一些资源回收的逻辑。
+
 
 ### 4.9 删除执行日志
 在任务日志界面，选中执行器和任务之后，点击右侧的"删除"按钮将会出现"日志清理"弹框，弹框中支持选择不同类型的日志清理策略，选中后点击"确定"按钮即可进行日志清理操作；
@@ -900,7 +929,7 @@ xxl-job-admin#com.xxl.job.admin.controller.JobApiController.callback
 脚本任务通过 Exit Code 判断任务执行结果，状态码可参考章节 "5.15 任务执行结果说明"；
 
 #### 5.5.4 执行器
-执行器实际上是一个内嵌的Jetty服务器，默认端口9999（配置项：xxl.job.executor.port）。
+执行器实际上是一个内嵌的Server，默认端口9999（配置项：xxl.job.executor.port）。
 
 在项目启动时，执行器会通过“@JobHandler”识别Spring容器中“Bean模式任务”，以注解的value属性为key管理起来。
 
@@ -918,7 +947,7 @@ XXL-JOB会为每次调度请求生成一个单独的日志文件，需要通过 
 ### 5.6 通讯模块剖析
 
 #### 5.6.1 一次完整的任务调度通讯流程 
-    - 1、“调度中心”向“执行器”发送http调度请求: “执行器”中接收请求的服务，实际上是一台内嵌jetty服务器，默认端口9999;
+    - 1、“调度中心”向“执行器”发送http调度请求: “执行器”中接收请求的服务，实际上是一台内嵌Server，默认端口9999;
     - 2、“执行器”执行任务逻辑；
     - 3、“执行器”http回调“调度中心”调度结果: “调度中心”中接收回调的服务，是针对执行器开放一套API服务;
 
@@ -1396,40 +1425,70 @@ Tips: 历史版本(V1.3.x)目前已经Release至稳定版本, 进入维护阶段
 - 1、调度中心告警邮件发送组件改为 “spring-boot-starter-mail”；
 - 2、任务告警逻辑调整，改为通过扫描失败日志方式触发。一方面精确扫描失败任务，降低扫描范围；另一方面取消内存队列，降低线程内存消耗；
 - 3、记住密码功能优化，选中时永久记住；非选中时关闭浏览器即登出；
-- [迭代中]注册中心优化，实时性注册发现：心跳注册间隔10s，refresh失败则首次注册并立即更新注册信息，心跳类似；30s过期销毁；
-- [迭代中]脚本任务，支持数据参数，新版本仅支持单参数不支持需要兼容；
-- [迭代中]提供执行器Docker镜像；
+- 4、项目依赖升级至较新稳定版本，如spring、jackson、groovy、xxl-rpc等等；
+- 5、精简项目，取消第三方依赖，如 commons-collections4 ;
+- 6、底层Log调优，应用正常终止取消异常栈信息打印；
+- 7、交互优化，尽量避免新开页面窗口；仅WebIDE支持新开页，并提供窗口快速关闭按钮；
+- 8、底层通讯方案优化：升级较新版本xxl-rpc，由"JETTY"方案调整为"NETTY_HTTP"方案，执行器内嵌netty-http-server提供服务，调度中心复用容器端口提供服务；
+- 9、任务暂停、删除优化，避免quartz delete不完整导致任务脏数据；
+- 10、任务回调、心跳注册成功日志优化，非核心常规日志调整为debug级别，降低冗余日志输出；
+- 11、执行器回调日志落盘方案复用RPC序列化方案，并移除Jackson依赖；
+- 12、任务支持更换绑定执行器，方便任务分组转移和管理；
+- 13、执行器热部署时JobHandler重新初始化，修复由此导致的 "jobhandler naming conflicts." 问题；
+- 14、新增Class的加载缓存，解决频繁加载Class会使jvm的方法区空间不足导致OOM的问题；
+- 15、调整首页报表默认区间为本周，避免日志量太大查询缓慢；
+- 16、LRU路由更新不及时问题修复；
+- 17、任务失败告警邮件发送逻辑优化；
+- 18、调度日志排序逻辑调整为按照调度时间倒序，兼容TIDB等主键不连续日志存储组件；
+- 19、执行器优雅停机优化；
+- 20、连接池配置优化，增强连接有效性验证；
+- 21、JobHandler#msg长度限制，修复异常情况下日志超长导致内存溢出的问题；
+- 22、Quartz触发线程池废弃并替换为 "XxlJobThreadPool"，降低线程切换、内存占用带来的消耗，提高调度性能；
+- 23、调度线程池隔离，拆分为"Fast"和"Slow"两个线程池，1分钟窗口期内任务耗时达500ms超过10次，该窗口期内判定为慢任务，慢任务自动降级进入"Slow"线程池，避免耗尽调度线程，提高系统稳定性；
+
+
+### 6.25 版本 v2.1.0 Release Notes[规划中]
+- [规划中] 移除quartz：精简底层实现，优化已知问题；
+    - 触发：单节点周期性触发，运行事件如delayqueue；
+    - 调度：集群竞争，负载方式协同处理，竞争-加入时间轮-释放-竞争；
+
 
 ### TODO LIST
 - 1、任务分片路由：分片采用一致性Hash算法计算出尽量稳定的分片顺序，即使注册机器存在波动也不会引起分批分片顺序大的波动；目前采用IP自然排序，可以满足需求，待定；
 - 2、任务单机多线程：提升任务单机并行处理能力；
-- 3、任务依赖，流程图，子任务+会签任务，各节点日志；
-- 4、调度任务优先级；
-- 5、移除quartz依赖，重写调度模块：新增或恢复任务时将下次执行记录插入delayqueue，调度中心集群竞争分布式锁，成功节点批量加载到期delayqueue数据，批量执行。
-- 6、多数据库支持，在重写并移除Quartz的基础上，DAO层通过JPA实现，不限制数据库类型；
-- 7、执行器Log清理功能：调度中心Log删除时同步删除执行器中的Log文件；
-- 8、Bean模式任务，JobHandler自动从执行器中查询展示为下拉框，选择后自动填充任务名称等属性；
-- 9、API事件触发类型任务（更类似MQ消息）支持"动态传参、延时消费"；该类型任务不走Quartz，单独建立MQ消息表，调度中心竞争触发；待定，该功能与 XXL-MQ 冲突，该场景建议用后者；
-- 10、调度线程池改为协程方式实现，大幅降低系统内存消耗；
-- 11、任务依赖增强，新增任务类型 "流程任务"，流程节点可挂载普通类型任务，承担任务依赖功能。现有子任务模型取消；需要考虑任务依赖死循环问题；
-- 12、提供多版本执行器：不依赖容器版本、不内嵌Jetty版本（通过配置executoraddress替换jetty通讯）等；
-- 13、注册中心支持扩展，除默认基于DB之外，支持扩展接入第三方注册中心如zk、eureka等；
-- 14、流程任务，支持参数传递；
-- 15、Cron TimeZone 自定义；
-- 16、忙碌转移优化，全部机器忙碌时不再直接失败；
-- 17、流程任务等，透传动态参数；
-- 18、任务支持切换执行器，quartz job group固定；
-- 19、任务自动注册；待考虑，因为任务自动注册将会导致任务难以管理控制；
-- 20、批量触发支持，添加参数 "org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 50"；
-- 21、失败重试间隔；
-- 22、任务权限管理：执行器为粒度分配权限，核心操作校验权限；
-- 23、SimpleTrigger 支持；
-- 24、cron在线生成工具，如 "cronboot/cron.qqe2"；
-- 25、调度日志列表加上执行时长列，并支持排序；
-- 26、dag任务，替换子任务：配置并列的"a-b、b-c"路径列表，构成串行、并行、dag任务流程，"dagre-d3"绘图；
-- 27、排程任务：支持时间短、时间点配置，支持配置多个，精确到秒；
-- 28、告警邮件内容，支持自定义模板配置；
-- 29、暂停状态，支持Cron 为空；
+- 3、调度任务优先级；
+- 4、移除quartz依赖，重写调度模块：新增或恢复任务时将下次执行记录插入delayqueue，调度中心集群竞争分布式锁，成功节点批量加载到期delayqueue数据，批量执行。
+- 5、多数据库支持，在重写并移除Quartz的基础上，DAO层通过JPA实现，不限制数据库类型；
+- 6、执行器Log清理功能：调度中心Log删除时同步删除执行器中的Log文件；
+- 7、Bean模式任务，JobHandler自动从执行器中查询展示为下拉框，选择后自动填充任务名称等属性；
+- 8、API事件触发类型任务（更类似MQ消息）支持"动态传参、延时消费"；该类型任务不走Quartz，单独建立MQ消息表，调度中心竞争触发；待定，该功能与 XXL-MQ 冲突，该场景建议用后者；
+- 9、调度线程池改为协程方式实现，大幅降低系统内存消耗；
+- 10、提供多版本执行器：不依赖容器版本、不内嵌Jetty版本（通过配置executoraddress替换server通讯）等；
+- 11、注册中心支持扩展，除默认基于DB之外，支持扩展接入第三方注册中心如zk、eureka等；
+- 12、流程任务，支持参数传递；
+- 13、Cron TimeZone 自定义；
+- 14、忙碌转移优化，全部机器忙碌时不再直接失败；
+- 15、流程任务等，透传动态参数；
+- 16、任务自动注册；待考虑，因为任务自动注册将会导致任务难以管理控制；
+- 17、批量触发支持，添加参数 "org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 50"；
+- 18、失败重试间隔；
+- 19、任务权限管理：执行器为粒度分配权限，核心操作校验权限；
+- 20、SimpleTrigger 支持；
+- 21、cron在线生成工具，如 "cronboot/cron.qqe2"；
+- 22、调度日志列表加上执行时长列，并支持排序；
+- 23、dag任务，替换子任务：配置并列的"a-b、b-c"路径列表，构成串行、并行、dag任务流程，"dagre-d3"绘图；任务依赖，流程图，子任务+会签任务，各节点日志；
+- 24、排程任务：支持时间短、时间点配置，支持配置多个，精确到秒；实现有效期等功能；
+- 25、告警邮件内容，支持自定义模板配置；
+- 26、暂停状态，支持Cron 为空；
+- 27、新增任务运行模式 "GLUE模式(GO) "，支持GO任务；
+- 28、quartz misfire 配置优化，计划改为0；
+- 29、新增状态列，支持筛选；
+- 30、注册中心优化，实时性注册发现：心跳注册间隔10s，refresh失败则首次注册并立即更新注册信息，心跳类似；30s过期销毁；
+- 31、提供执行器Docker镜像；
+- 32、脚本任务，支持数据参数，新版本仅支持单参数不支持需要兼容；
+- 33、GLUE 模式 Web Ide 版本对比功能；
+- 34、批量调度：调度请求入queue，调度线程批量获取调度请求并发起远程调度；提高线程效率；
+- 35、执行器端口复用，http通讯自动添加相对地址 "/xxl-job"：
 
 
 ## 七、其他
