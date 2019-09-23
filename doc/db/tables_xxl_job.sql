@@ -71,15 +71,14 @@ CREATE TABLE `xxl_job_registry` (
   `registry_value` varchar(255) NOT NULL,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `i_g_k_v` (`registry_group`,`registry_key`,`registry_value`),
-  KEY `i_u` (`update_time`)
+  KEY `i_g_k_v` (`registry_group`,`registry_key`,`registry_value`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `xxl_job_group` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `app_name` varchar(64) NOT NULL COMMENT '执行器AppName',
   `title` varchar(12) NOT NULL COMMENT '执行器名称',
-  `order` tinyint(4) NOT NULL DEFAULT '0' COMMENT '排序',
+  `order` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
   `address_type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '执行器地址类型：0=自动注册、1=手动录入',
   `address_list` varchar(512) DEFAULT NULL COMMENT '执行器地址列表，多地址逗号分隔',
   PRIMARY KEY (`id`)
